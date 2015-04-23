@@ -11,6 +11,7 @@ import CoreData
 
 @objc(Photo)
 
+// Represents a photo at a specific place on the map (Pin)
 class Photo: NSManagedObject {
     
     static let ModelName = "Photo"
@@ -28,9 +29,17 @@ class Photo: NSManagedObject {
         static let Failure = "failure"
     }
     
-    @NSManaged var imageFilename: String?
+
+    // The remote image URL. Used to download it
     @NSManaged var imageURL: String?
+    
+    // The local filename. It assumes that the file is placed 
+    // at CoreDataStackManager.sharedInstance().imagesDocumentDirectory
+    @NSManaged var imageFilename: String?
+    
+    // The state of the photo
     @NSManaged var imageState: String?
+    // The place on the map that "owns" this photo
     @NSManaged var pin: Pin?
     
     var imagePath: String? {
@@ -60,6 +69,7 @@ class Photo: NSManagedObject {
         }
     }
     
+    // before delete this entity delete the image in the FS
     override func prepareForDeletion() {
         // Delete file if possible
         if let imagePath = self.imagePath {

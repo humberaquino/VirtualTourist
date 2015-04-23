@@ -10,6 +10,8 @@
 		570E0E291AE84400006DF6A0 /* FlickrImageDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E0E281AE84400006DF6A0 /* FlickrImageDownloadManager.swift */; };
 		570E0E2C1AE97A44006DF6A0 /* UIKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E0E2B1AE97A44006DF6A0 /* UIKitExtensions.swift */; };
 		570E0E2E1AE98C4F006DF6A0 /* PhotoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E0E2D1AE98C4F006DF6A0 /* PhotoService.swift */; };
+		570E0E311AE993A0006DF6A0 /* PinHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E0E301AE993A0006DF6A0 /* PinHistory.swift */; };
+		570E0E331AE996D9006DF6A0 /* PinService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570E0E321AE996D9006DF6A0 /* PinService.swift */; };
 		578746B71AE59ECD009379E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578746B61AE59ECD009379E5 /* AppDelegate.swift */; };
 		578746BC1AE59ECD009379E5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 578746BA1AE59ECD009379E5 /* Main.storyboard */; };
 		578746BE1AE59ECD009379E5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 578746BD1AE59ECD009379E5 /* Images.xcassets */; };
@@ -47,6 +49,8 @@
 		570E0E281AE84400006DF6A0 /* FlickrImageDownloadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrImageDownloadManager.swift; sourceTree = "<group>"; };
 		570E0E2B1AE97A44006DF6A0 /* UIKitExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIKitExtensions.swift; sourceTree = "<group>"; };
 		570E0E2D1AE98C4F006DF6A0 /* PhotoService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoService.swift; sourceTree = "<group>"; };
+		570E0E301AE993A0006DF6A0 /* PinHistory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinHistory.swift; sourceTree = "<group>"; };
+		570E0E321AE996D9006DF6A0 /* PinService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinService.swift; sourceTree = "<group>"; };
 		578746B11AE59ECD009379E5 /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		578746B51AE59ECD009379E5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		578746B61AE59ECD009379E5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				570E0E2D1AE98C4F006DF6A0 /* PhotoService.swift */,
+				570E0E321AE996D9006DF6A0 /* PinService.swift */,
 			);
 			name = Service;
 			sourceTree = "<group>";
@@ -250,6 +255,7 @@
 				578746E31AE6D5A3009379E5 /* Model.xcdatamodeld */,
 				578746E71AE6D680009379E5 /* Pin.swift */,
 				578746E91AE6DADD009379E5 /* Photo.swift */,
+				570E0E301AE993A0006DF6A0 /* PinHistory.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -376,6 +382,7 @@
 				578746F91AE70308009379E5 /* Config.swift in Sources */,
 				578746F61AE702E8009379E5 /* HTTPClientExtensions.swift in Sources */,
 				578746B71AE59ECD009379E5 /* AppDelegate.swift in Sources */,
+				570E0E311AE993A0006DF6A0 /* PinHistory.swift in Sources */,
 				578746EE1AE6F273009379E5 /* PhotoAlbumViewController.swift in Sources */,
 				578746DF1AE6CD42009379E5 /* CoreDataStackManager.swift in Sources */,
 				578746D91AE5A1C8009379E5 /* TravelLocationsViewController.swift in Sources */,
@@ -386,6 +393,7 @@
 				578746E11AE6D342009379E5 /* ErrorManager.swift in Sources */,
 				578746F11AE6F2B4009379E5 /* PhotoCollectionViewCell.swift in Sources */,
 				570E0E2E1AE98C4F006DF6A0 /* PhotoService.swift in Sources */,
+				570E0E331AE996D9006DF6A0 /* PinService.swift in Sources */,
 				578746E51AE6D5A3009379E5 /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

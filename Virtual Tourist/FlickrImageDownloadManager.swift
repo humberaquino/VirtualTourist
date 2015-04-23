@@ -74,8 +74,14 @@ class FlickrImageDownloadManager: NSObject {
             }
             pin.totalPages = result!.pages
             
+            
+            // TODO: Show the state change?
+//            pin.state = Pin.State.Downloading
+            
             // 5. Save on main queue
-            self.performOnMainQueue({ () -> Void in
+            self.performOnMainQueue {
+                
+                pin.pendingDownloads = totalPhotos
                 CoreDataStackManager.sharedInstance().saveContext()
                 
                 // The list is complete. Call the completion block but continue downloading images
@@ -84,7 +90,7 @@ class FlickrImageDownloadManager: NSObject {
                 // 6. Get all images in state new and download their images
                 self.downloadPinImages(pin)
                 
-            })
+            }
             
         }
     }
@@ -100,6 +106,7 @@ class FlickrImageDownloadManager: NSObject {
                 }
             }
         }
+        
         println("Pin does not have photos")
     }
     
@@ -130,9 +137,12 @@ class FlickrImageDownloadManager: NSObject {
                     photo.imageState = Photo.State.Ready
                     
                     self.performOnMainQueue {
-                        // Save photo
+                        photo.pin!.decreasePendingDownloads()
+                        
+                        // Save photo and pin count
                         CoreDataStackManager.sharedInstance().saveContext()
-                        println("Saved: \(filename)")
+                        println("Saved: \(filename)")                  
+                        
                     }
                 } else {
                     // Could not save file

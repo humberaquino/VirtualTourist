@@ -9,10 +9,14 @@
 import Foundation
 import CoreData
 import CoreLocation
+import MapKit
 
 @objc(Pin)
 
-class Pin: NSManagedObject {
+
+// Represents a Pin in the map that a virutal tourist visits
+// It holds a list of photos of that place
+class Pin: NSManagedObject, MKAnnotation {
     
     static let ModelName = "Pin"
     static let InitialPageNumber = 0
@@ -26,13 +30,19 @@ class Pin: NSManagedObject {
     
     @NSManaged var latitude: Double
     @NSManaged var longitude: Double
-    @NSManaged var currentPage: Int
-    @NSManaged var totalPages: Int
     @NSManaged var photos: [Photo]?
     
-    var coordinate: CLLocationCoordinate2D {
-        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
+    // List of places where the pin has been :)
+    @NSManaged var history: [Pin]?
+    
+    // Info to use on Flickr to know what is the next page to get when
+    // the user asks for a "New collection"
+    @NSManaged var currentPage: Int
+    @NSManaged var totalPages: Int
+    
+    @NSManaged var pendingDownloads: Int
+    
+   
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
@@ -56,6 +66,40 @@ class Pin: NSManagedObject {
         } else {
             self.totalPages = 0
         }
+        
+        pendingDownloads = 0
     }
+    
+    func appendHistory(history: PinHistory) {
+        history.pin = self
+        
+        latitude = history.latitude
+        longitude = history.longitude
+    }
+    
+    func decreasePendingDownloads() {
+        pendingDownloads--
+    }
+    
+    override var description: String {
+        return "Pin: \(latitude), \(longitude)"
+    }        
+    
+    // MARK - MKAnnotation
+    
+    var coordinate: CLLocationCoordinate2D {
+        get {
+            return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        }
+        set {
+            self.latitude = newValue.latitude
+            self.longitude = newValue.longitude
+        }
+    }
+    
+    var title: String = "View album"
+    
+    var subtitle: String? = nil
 
+    
 }

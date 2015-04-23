@@ -9,24 +9,19 @@
 import Foundation
 import MapKit
 
-class TouristPinAnnotation: MKPointAnnotation {
-    
-    var pin: Pin
-    
-    init(pin: Pin) {
-        self.pin = pin
-        super.init()
-        
-        syncPinCoordinatesToAnnotation()
-    }
-    
-    func syncAnnotationCoordinatesToPin() {
-        self.pin.latitude = self.coordinate.latitude
-        self.pin.longitude = self.coordinate.longitude
-    }
-    
-    func syncPinCoordinatesToAnnotation() {
-        self.coordinate.latitude = self.pin.latitude
-        self.coordinate.longitude = self.pin.longitude
-    }
-}
+//class TouristPinAnnotation: MKPointAnnotation {
+//    
+//    var pin: Pin
+//    
+//    init(pin: Pin) {
+//        self.pin = pin
+//        super.init()
+//        
+//        syncPinCoordinatesToAnnotation()
+//    }      
+//    
+//    func syncPinCoordinatesToAnnotation() {
+//        self.coordinate.latitude = self.pin.latitude
+//        self.coordinate.longitude = self.pin.longitude
+//    }
+//}

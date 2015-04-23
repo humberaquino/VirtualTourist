@@ -8,9 +8,10 @@
 
 import Foundation
 
+// Service layer for Photo methods
 class PhotoService {
  
-    var sharedContext = CoreDataStackManager.sharedInstance().managedObjectContext!
+    let sharedContext = CoreDataStackManager.sharedInstance().managedObjectContext!
     
     func deletePinPhotosAndSave(pin: Pin) {
         if let photos = pin.photos {

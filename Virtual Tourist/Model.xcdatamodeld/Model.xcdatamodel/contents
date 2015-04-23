@@ -10,11 +10,20 @@
         <attribute name="currentPage" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="pendingDownloads" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="totalPages" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="history" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="PinHistory" inverseName="pin" inverseEntity="PinHistory" syncable="YES"/>
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Photo" inverseName="pin" inverseEntity="Photo" syncable="YES"/>
+    </entity>
+    <entity name="PinHistory" representedClassName="PinHistory" syncable="YES">
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="placedOn" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="pin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pin" inverseName="history" inverseEntity="Pin" syncable="YES"/>
     </entity>
     <elements>
         <element name="Photo" positionX="-36" positionY="9" width="128" height="105"/>
-        <element name="Pin" positionX="-54" positionY="-9" width="128" height="120"/>
+        <element name="Pin" positionX="-54" positionY="-9" width="128" height="150"/>
+        <element name="PinHistory" positionX="-45" positionY="36" width="128" height="105"/>
     </elements>
 </model>
