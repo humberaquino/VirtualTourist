@@ -9,8 +9,7 @@
 import Foundation
 import CoreData
 
-class CoreDataStackManager {
-    
+class CoreDataStackManager {    
     
     // MARK: - Core Data Saving support
     

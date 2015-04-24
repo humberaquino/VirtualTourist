@@ -13,8 +13,11 @@ import CoreLocation
 // Service layer for Pin methods
 class PinService {
     
-    let sharedContext = CoreDataStackManager.sharedInstance().managedObjectContext!
+    lazy var sharedContext: NSManagedObjectContext! = {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
     
+    // Add a PinHistory to the Pin with it's current values
     func addCurrentAsHistory(pin: Pin) {
         
         let dictionary: [String: AnyObject] = [

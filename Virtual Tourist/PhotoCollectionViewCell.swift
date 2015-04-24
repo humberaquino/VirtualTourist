@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+// View cell for a single photo
 class PhotoCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var imageView: UIImageView!

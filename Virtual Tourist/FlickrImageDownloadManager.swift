@@ -10,10 +10,13 @@ import Foundation
 import CoreLocation
 import CoreData
 
+// Sinfleton used to download images from Flickr and save them into Core Data
 class FlickrImageDownloadManager: NSObject {
     
     let httpClient = HTTPClient.sharedInstance()
     
+    // This operation queue is used to download the images using NSData to prevent
+    // Freezing the Main queue
     let downloadQueue = NSOperationQueue()
     
     lazy var sharedContext: NSManagedObjectContext! = {
@@ -25,14 +28,17 @@ class FlickrImageDownloadManager: NSObject {
         downloadQueue.maxConcurrentOperationCount = Queue.DownloadQueueMaxConcurrentOperationCount
     }
     
-    // Fetch the initial page of images for a location
+    // MARK: - Fetch methods
+    
+    // Fetch a page of images for a pin location
     func fetchInitialPhotosForPin(pin: Pin, completionHandler:((totalFetched: Int?, error: NSError?) -> Void)) {
         
-        // 1. Fetch 21 photos of the location
+        // 1. Fetch photos of the location
         let page = pin.currentPage + 1
         let total = Pagination.TotalPhotosPerPage
         let coordinate = pin.coordinate
         
+        // We get the JSON info to know what urls we need to download
         fetchPhotosJSONForLocation(coordinate, fromPage: page, total: total) {
             (json, error) in
             if let error = error {
@@ -53,7 +59,6 @@ class FlickrImageDownloadManager: NSObject {
                 }
                 return
             }
-          
             
             // 3. Create 21 (or the amount fetched) entities of Photos with the url of the image and the state: New
             let totalPhotos = result!.photoURLs.count
@@ -74,29 +79,43 @@ class FlickrImageDownloadManager: NSObject {
             }
             pin.totalPages = result!.pages
             
-            
-            // TODO: Show the state change?
-//            pin.state = Pin.State.Downloading
-            
             // 5. Save on main queue
             self.performOnMainQueue {
-                
                 pin.pendingDownloads = totalPhotos
                 CoreDataStackManager.sharedInstance().saveContext()
                 
-                // The list is complete. Call the completion block but continue downloading images
+                // The Photos are created and associated with the pin.
+                // Call the caller to let them know that we know how much photos
+                // we need to download
                 completionHandler(totalFetched: totalPhotos, error: nil)
                 
-                // 6. Get all images in state new and download their images
+                // 6. Start the download of the images, if necesary
                 self.downloadPinImages(pin)
-                
             }
-            
         }
     }
     
+    // Do a paginated search of images using coordinate. The result is the JSON unalterated
+    func fetchPhotosJSONForLocation(coordinate: CLLocationCoordinate2D, fromPage page: Int, total: Int, completionHandler:((json: NSDictionary?, error: NSError?) -> Void)) {
+        
+        let parameters = locationImagePaginatedSearch(coordinate, page: page, perPage: total)
+        
+        httpClient.jsonTaskForGETMethod(URLs.BaseURL, parameters: parameters) { (jsonResponse, response, error) -> Void in
+            if let error = error {
+                // Error in the GET request
+                completionHandler(json: nil, error: error)
+                return
+            }
+            // Success
+            completionHandler(json: jsonResponse, error: nil)
+        }
+    }
+    
+    
+    // MARK: - Downloading
+    
+    // Initiates the download of all the photos of the pin parameter
     func downloadPinImages(pin: Pin) {
-       
         if let photos = pin.photos {
             if photos.count > 0 {
                 downloadQueue.addOperationWithBlock {
@@ -104,6 +123,7 @@ class FlickrImageDownloadManager: NSObject {
                         self.downloadAndSavePhoto(photo)
                     }
                 }
+                return
             }
         }
         
@@ -111,6 +131,7 @@ class FlickrImageDownloadManager: NSObject {
     }
     
     
+    // Download a single photo and save it's data when done
     // This method should be performed on the download Queue
     func downloadAndSavePhoto(photo: Photo) {
         // Do it in another queue
@@ -157,33 +178,14 @@ class FlickrImageDownloadManager: NSObject {
         }
     }
     
+    // MARK: - Utilities
     
     func obtainPhotoFilename(photoURL: NSURL) -> String {
-        // TODO: Check for errors?
         let components = photoURL.pathComponents as! [String]
         return components.last!
     }
-
-    // Do a paginated search of images using coordinate. The result is the JSON unalterated
-    func fetchPhotosJSONForLocation(coordinate: CLLocationCoordinate2D, fromPage page: Int, total: Int, completionHandler:((json: NSDictionary?, error: NSError?) -> Void)) {
-        
-        let parameters = locationImagePaginatedSearch(coordinate, page: page, perPage: total)
-        
-        httpClient.jsonTaskForGETMethod(URLs.BaseURL, parameters: parameters) { (jsonResponse, response, error) -> Void in
-            if let error = error {
-                // Error in the GET request
-                completionHandler(json: nil, error: error)
-                return
-            }
-            // Success
-            completionHandler(json: jsonResponse, error: nil)
-        }
-        
-    }
     
-    
-    
-    // MARK: Shared instance
+    // MARK: - Shared instance
     
     class func sharedInstance() -> FlickrImageDownloadManager {
         struct Static {
@@ -195,12 +197,13 @@ class FlickrImageDownloadManager: NSObject {
 }
 
 
-// MARK: JSON utilities
+// MARK: - JSON utilities
 
 extension FlickrImageDownloadManager {
 
+    // Based on the search result, navigate the JSON and get the list of URLs to download
+    // and the amount of pages according to Flickr
     func parsePhotos(json: NSDictionary, inout error: NSError?) -> (photoURLs:[String], pages: Int)? {
-        
         if let photoInfo = json[ResponseKeys.Photos] as? NSDictionary {
             if let pages = photoInfo[ParameterValues.Pages] as? Int {
                 
@@ -219,17 +222,6 @@ extension FlickrImageDownloadManager {
         error = ErrorUtils.errorForJSONInterpreting(json)
         return nil
     }
-    
-    func parsePhotosTotalPages(json: NSDictionary, inout error: NSError?) -> Int? {
-        if let photoInfo = json[ResponseKeys.Photos] as? [String: AnyObject?] {
-            if let pages = photoInfo[ParameterValues.Pages] as? Int {
-                return pages
-            }
-        }
-        error = ErrorUtils.errorForJSONInterpreting(json)
-        return nil
-    }
-    
     
 }
 

@@ -32,10 +32,14 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
     
     var sharedContext: NSManagedObjectContext!
     
+    // Helper variable to know which pin to view the album
     var selectedPin: Pin!
     
     let photoService = PhotoService()
     let pinService = PinService()
+    
+    
+    // MARK: - View life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,9 +57,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         // Load previous map state
         loadPersistedMapViewRegion()
         
-        // Load pins
-//        loadAllPinLocations()
-        
+        // Do the initial fetch
         var error: NSError?
         fetchedResultsController.performFetch(&error)
         
@@ -66,11 +68,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         configureAnnotations()
     }
     
-    func configureAnnotations() {
-        let annotations = mapView.annotations
-        mapView.removeAnnotations(annotations)
-        mapView.addAnnotations(fetchedResultsController.fetchedObjects)
-    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -93,9 +90,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         let touchPoint = gestureRecognizer.locationInView(mapView)
         let touchMapCoordiantes = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
         
-        // TODO: Add anotation
         println("Create pin: \(touchMapCoordiantes)")
-        
         
         addNewPinToMap(touchMapCoordiantes)
         
@@ -123,21 +118,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         return annotationView
     }
     
-    func configurePinColor(pinAnnotationView view: MKPinAnnotationView) {
-        
-        let pin = view.annotation as! Pin
-        var defaultColor: MKPinAnnotationColor = MKPinAnnotationColor.Green
-        
-        if pin.pendingDownloads > 0 {
-             if pin.pendingDownloads < 10 {
-                defaultColor = MKPinAnnotationColor.Purple
-            } else {
-                defaultColor = MKPinAnnotationColor.Red
-            }
-        }
-        
-        view.pinColor = defaultColor
-    }
     
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!,
         didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
@@ -153,11 +133,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
                     
                     // Now we can start downloading the photos of the new location
                     downloadPhotosForPin(pin)
-                    
-//                    let pinAnnotationView = view as! MKPinAnnotationView
-//                    configurePinColor(pinAnnotationView: pinAnnotationView)
                 }
-                
             }
     }
     
@@ -173,6 +149,22 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         persistMapViewRegion(mapView.region)
     }
     
+    func configurePinColor(pinAnnotationView view: MKPinAnnotationView) {
+        
+        let pin = view.annotation as! Pin
+        var defaultColor: MKPinAnnotationColor = MKPinAnnotationColor.Green
+        
+        if pin.pendingDownloads > 0 {
+            if pin.pendingDownloads < 10 {
+                defaultColor = MKPinAnnotationColor.Purple
+            } else {
+                defaultColor = MKPinAnnotationColor.Red
+            }
+        }
+        
+        view.pinColor = defaultColor
+    }
+    
     // Mark: - Segue
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -183,27 +175,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         }
     }
     
-    
     // MARK: - Persistense
-    
-    // MARK: Core Data
-    
-//    func loadAllPinLocations() {
-//        
-//        let request = NSFetchRequest(entityName: Pin.ModelName)
-//        
-//        var fetchError: NSError? = nil
-//        var result = sharedContext.executeFetchRequest(request, error: &fetchError) as? [Pin]
-//        if let error = fetchError {
-//            // Error during fetch
-//            // TODO: Show alert
-//            return
-//        }
-//        // Add all fetched pins to the map
-//        for pin in result! {
-//            addExistingPinAnnotationToMap(pin)
-//        }
-//    }
     
     func addNewPinToMap(coordinate: CLLocationCoordinate2D) {        
         let dict = [
@@ -215,10 +187,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         let pin = Pin(dictionary: dict, context: sharedContext)
         CoreDataStackManager.sharedInstance().saveContext()
         
-//        addExistingPinAnnotationToMap(pin)
-        
         downloadPhotosForPin(pin)
-        
     }
     
     func downloadPhotosForPin(pin: Pin) {
@@ -226,54 +195,22 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
             println("Initial fetch complete: \(totalFetched!)")
         })
     }
-    
-//    func addPinAnnotationToMap(pin: Pin) {
-//        // Add an annotation whr the long tap was placed
-//        let annotation = TouristPinAnnotation(pin: pin)
-//        annotation.title = "View album"
-//        mapView.addAnnotation(annotation)
-//    }
-    
-    //////////////////////////
-    // MARK: - Fetched Results Controller Delegate
-    
-    // Whenever changes are made to Core Data the following three methods are invoked. This first method is used to create
-    // three fresh arrays to record the index paths that will be changed.
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        // We are about to handle some new changes. Start out with empty arrays for each change type
-//        insertedIndexPaths = [NSIndexPath]()
-//        deletedIndexPaths = [NSIndexPath]()
-//        updatedIndexPaths = [NSIndexPath]()
-        
-        println("in controllerWillChangeContent")
-    }
-    
+
+    // MARK: - NSFetchedResultsControllerDelegate
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        
+        let pin = anObject as! Pin
+        
         switch (type) {
         case NSFetchedResultsChangeType.Insert:
-            let annotation = anObject as! Pin
-            annotation.title = "View Album (\(annotation.history!.count))"
-            mapView.addAnnotation(annotation)
+            insertAnnotation(pin)
             break;
         case NSFetchedResultsChangeType.Delete:
-            let annotation = anObject as! Pin
-            self.mapView.removeAnnotation(annotation)
+            removeAnnotation(pin)
             break;
         case NSFetchedResultsChangeType.Update:
-
-            let annotation = anObject as! Pin
-            
-//            configurePinColor
-            
-            
-//            self.mapView.removeAnnotation(annotation)
-//            annotation.title = "View Album \(annotation.pendingDownloads)"
-//            self.mapView.addAnnotation(annotation)
-            annotation.title = "View Album (\(annotation.history!.count))"
-            let annotationView = mapView.viewForAnnotation(annotation) as! MKPinAnnotationView
-            configurePinColor(pinAnnotationView: annotationView)
-            
+            updateAnnotation(pin)
             break;
         case NSFetchedResultsChangeType.Move:
             // do nothing
@@ -283,9 +220,41 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
             break;
         }
     }
-    //////////////////////
     
+    // MARK: - Utilities
     
+    func insertAnnotation(pin: Pin) {
+        setupPinTitle(pin)
+        mapView.addAnnotation(pin)
+    }
+    
+    func updateAnnotation(pin: Pin) {
+        setupPinTitle(pin)
+        let annotationView = mapView.viewForAnnotation(pin) as! MKPinAnnotationView
+        configurePinColor(pinAnnotationView: annotationView)
+    }
+    
+    func removeAnnotation(pin: Pin) {
+        mapView.removeAnnotation(pin)
+    }
+    
+    func setupPinTitle(pin: Pin) {
+        var title = "View Album"
+        if let history = pin.history {
+            if history.count > 1 {
+                title += " (\(history.count))"
+            }
+        }
+        
+        pin.title = title
+    }
+    
+    // Utility method to start a fresh mapview
+    func configureAnnotations() {
+        let annotations = mapView.annotations
+        mapView.removeAnnotations(annotations)
+        mapView.addAnnotations(fetchedResultsController.fetchedObjects)
+    }
     
     lazy var fetchedResultsController: NSFetchedResultsController = {
         
@@ -324,8 +293,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
             let longitude = userDetaults.doubleForKey(MapCenterLongitudeKey)
             let latitudeDelta = userDetaults.doubleForKey(MapSpanLatitudeDeltaKey)
             let longitudeDelta = userDetaults.doubleForKey(MapSpanLongitudeDeltaKey)
-            
-            
+                        
             mapView.region.center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             mapView.region.span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
         }

@@ -4,7 +4,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
     </dependencies>
     <scenes>
-        <!--Travel Locations View Controller-->
+        <!--Virtual Tourist-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
                 <viewController id="vXZ-lx-hvc" customClass="TravelLocationsViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -28,7 +28,7 @@
                             <constraint firstAttribute="centerX" secondItem="Gt3-VI-as3" secondAttribute="centerX" id="y68-ik-WMI"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="dgT-Bw-HtC"/>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="dgT-Bw-HtC"/>
                     <connections>
                         <outlet property="mapView" destination="Gt3-VI-as3" id="Yxb-LX-0nK"/>
                         <segue destination="1JE-vx-Oz1" kind="show" identifier="ViewLocationImagesIdentifier" id="8zK-ce-UQm"/>
@@ -36,7 +36,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1270" y="317"/>
+            <point key="canvasLocation" x="1290" y="317"/>
         </scene>
         <!--Photos-->
         <scene sceneID="vxK-OB-YoS">
@@ -51,7 +51,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="t1Q-oW-Had">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="556"/>
+                                <rect key="frame" x="0.0" y="114" width="600" height="442"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="3T6-Fc-Oyu">
                                     <size key="itemSize" width="120" height="120"/>
@@ -115,6 +115,12 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="a5C-Pd-yQk"/>
                                 </items>
                             </toolbar>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="nfz-3I-QE5">
+                                <rect key="frame" x="0.0" y="64" width="600" height="110"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="110" id="68K-iT-6B9"/>
+                                </constraints>
+                            </mapView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ec1-vh-25s">
                                 <rect key="frame" x="109" y="284" width="382" height="32"/>
                                 <constraints>
@@ -128,33 +134,31 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="t1Q-oW-Had" firstAttribute="top" secondItem="nfz-3I-QE5" secondAttribute="bottom" constant="-60" id="5bc-us-hK3"/>
                             <constraint firstItem="OLw-ub-L9O" firstAttribute="top" secondItem="t1Q-oW-Had" secondAttribute="bottom" id="9Mj-JX-mc9"/>
-                            <constraint firstItem="t1Q-oW-Had" firstAttribute="top" secondItem="1RQ-PH-M8Z" secondAttribute="bottom" constant="-64" id="KHh-ZM-rBg"/>
                             <constraint firstItem="XUF-Z3-dBf" firstAttribute="top" secondItem="OLw-ub-L9O" secondAttribute="bottom" id="KJr-hU-ywI"/>
                             <constraint firstItem="t1Q-oW-Had" firstAttribute="width" secondItem="eaK-Dp-9Ib" secondAttribute="width" id="NhR-ra-Bqu"/>
                             <constraint firstAttribute="centerX" secondItem="OLw-ub-L9O" secondAttribute="centerX" id="QH6-Vc-RAT"/>
-                            <constraint firstItem="Ec1-vh-25s" firstAttribute="centerY" secondItem="t1Q-oW-Had" secondAttribute="centerY" constant="22" id="WPC-T5-ccy"/>
+                            <constraint firstItem="nfz-3I-QE5" firstAttribute="top" secondItem="1RQ-PH-M8Z" secondAttribute="bottom" id="QmR-pg-EpT"/>
+                            <constraint firstItem="Ec1-vh-25s" firstAttribute="centerY" secondItem="t1Q-oW-Had" secondAttribute="centerY" constant="-35" id="WPC-T5-ccy"/>
                             <constraint firstItem="Ec1-vh-25s" firstAttribute="centerX" secondItem="t1Q-oW-Had" secondAttribute="centerX" id="XGT-b0-4Tz"/>
+                            <constraint firstItem="nfz-3I-QE5" firstAttribute="leading" secondItem="t1Q-oW-Had" secondAttribute="leading" id="gBX-bs-Nfh"/>
                             <constraint firstItem="OLw-ub-L9O" firstAttribute="width" secondItem="eaK-Dp-9Ib" secondAttribute="width" id="jVI-Hx-wN9"/>
+                            <constraint firstItem="nfz-3I-QE5" firstAttribute="trailing" secondItem="t1Q-oW-Had" secondAttribute="trailing" id="oOS-nr-nOE"/>
                             <constraint firstAttribute="centerX" secondItem="t1Q-oW-Had" secondAttribute="centerX" id="s4V-Zc-vK6"/>
-                            <constraint firstAttribute="centerY" secondItem="t1Q-oW-Had" secondAttribute="centerY" id="sDb-Nx-bvg"/>
                         </constraints>
-                        <variation key="default">
-                            <mask key="constraints">
-                                <exclude reference="sDb-Nx-bvg"/>
-                            </mask>
-                        </variation>
                     </view>
                     <navigationItem key="navigationItem" title="Photos" id="AmU-Kz-CPo"/>
                     <connections>
                         <outlet property="collectionCenteredLabel" destination="Ec1-vh-25s" id="r1j-H3-L73"/>
                         <outlet property="collectionView" destination="t1Q-oW-Had" id="wlQ-OA-7cA"/>
+                        <outlet property="mapView" destination="nfz-3I-QE5" id="sBs-J1-KUJ"/>
                         <outlet property="newCollectionButton" destination="Ksc-6U-ZfH" id="fdh-KD-tQj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tAf-iU-FLv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2852" y="317"/>
+            <point key="canvasLocation" x="2786" y="317"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Byh-W9-Iv3">

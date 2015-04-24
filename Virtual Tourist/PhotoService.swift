@@ -7,12 +7,16 @@
 //
 
 import Foundation
+import CoreData
 
 // Service layer for Photo methods
 class PhotoService {
  
-    let sharedContext = CoreDataStackManager.sharedInstance().managedObjectContext!
+    lazy var sharedContext: NSManagedObjectContext! = {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
     
+    // Delete all pin's photos and then save
     func deletePinPhotosAndSave(pin: Pin) {
         if let photos = pin.photos {
             for photo in photos {
@@ -22,12 +26,13 @@ class PhotoService {
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
-    
+    // Delete one photo and save
     func deletePhotoAndSave(photo: Photo) {
         deletePhoto(photo)
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
+    // Only delete the photo
     func deletePhoto(photo: Photo) {
         photo.pin = nil
         sharedContext.deleteObject(photo)
