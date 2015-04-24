@@ -118,25 +118,32 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         return annotationView
     }
     
-    
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!,
         didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+            let pin = view.annotation as! Pin
             if newState == MKAnnotationViewDragState.Ending {
-                let pin = view.annotation as! Pin
-                
                 if pin.pendingDownloads > 0 {
-                    showMessageWithTitle("Operation not permited", message: "Can't change the pin's location while it is downloading images. Please wait until it turns green and try again.")
+                    showDraggingNotAllowedMessage()
                 } else {
                     // Add a pin history, update current pin and delete all the old photos. The save
                     pinService.addCurrentAsHistory(pin)
                     photoService.deletePinPhotosAndSave(pin)
                     
+                    // Mark the dragged pin as red
+                    let pinAnnotationView = view as! MKPinAnnotationView
+                    pinAnnotationView.pinColor = MKPinAnnotationColor.Red
+                    
                     // Now we can start downloading the photos of the new location
                     downloadPhotosForPin(pin)
+                }
+            } else if newState == MKAnnotationViewDragState.Dragging {
+                if pin.pendingDownloads > 0 {
+                    showDraggingNotAllowedMessage()
                 }
             }
     }
     
+  
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
         if control == view.rightCalloutAccessoryView {
             let annotation = view.annotation as! Pin
@@ -247,6 +254,10 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         }
         
         pin.title = title
+    }
+    
+    func showDraggingNotAllowedMessage() {
+        showMessageWithTitle("Operation not permited", message: "Can't change the pin's location while it is downloading images. Please wait until it turns green and try again.")
     }
     
     // Utility method to start a fresh mapview

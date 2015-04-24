@@ -20,6 +20,11 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
     let PhotoCell = "PhotoCell"
     let LocationSpanValue = 0.004
     
+    // Keep the changes. We will keep track of insertions, deletions, and updates.
+    var insertedIndexPaths: [NSIndexPath]!
+    var deletedIndexPaths: [NSIndexPath]!
+    var updatedIndexPaths: [NSIndexPath]!
+    
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     @IBOutlet weak var collectionCenteredLabel: UILabel!
@@ -124,6 +129,79 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         }
     }
     
+    // MARK: - NSFetchedResultsControllerDelegate
+    
+    // Whenever changes are made to Core Data the following three methods are invoked. This first method is used to create
+    // three fresh arrays to record the index paths that will be changed.
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        // We are about to handle some new changes. Start out with empty arrays for each change type
+        insertedIndexPaths = [NSIndexPath]()
+        deletedIndexPaths = [NSIndexPath]()
+        updatedIndexPaths = [NSIndexPath]()
+        
+        println("in controllerWillChangeContent")
+    }
+    
+    // The second method may be called multiple times, once for each Image object that is added, deleted, or changed.
+    // We store the incex paths into the three arrays.
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        
+        switch type{
+            
+        case .Insert:
+            println("Insert an item")
+            insertedIndexPaths.append(newIndexPath!)
+            break
+        case .Delete:
+            println("Delete an item")
+            deletedIndexPaths.append(indexPath!)
+            break
+        case .Update:
+            println("Update an item.")
+            updatedIndexPaths.append(indexPath!)
+            break
+        case .Move:
+            println("Move an item. We don't expect to see this in this app.")
+            break
+        default:
+            break
+        }
+    }
+    
+    // This method is invoked after all of the changed in the current batch have been collected
+    // into the three index path arrays (insert, delete, and upate). We now need to loop through the
+    // arrays and perform the changes.
+    //
+    // The most interesting thing about the method is the collection view's "performBatchUpdates" method.
+    // Notice that all of the changes are performed inside a closure that is handed to the collection view.
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        
+        println("in controllerDidChangeContent. changes.count: \(insertedIndexPaths.count + deletedIndexPaths.count)")
+        
+        collectionView.performBatchUpdates({() -> Void in
+            
+            for indexPath in self.insertedIndexPaths {
+                self.collectionView.insertItemsAtIndexPaths([indexPath])
+            }
+            
+            for indexPath in self.deletedIndexPaths {
+                self.collectionView.deleteItemsAtIndexPaths([indexPath])
+            }
+            
+            for indexPath in self.updatedIndexPaths {
+                self.collectionView.reloadItemsAtIndexPaths([indexPath])
+            }
+            
+            }, completion: {
+                    (success) in
+                if self.deletedIndexPaths.count > 0
+                    || self.insertedIndexPaths.count > 0
+                    || self.updatedIndexPaths.count > 0 {
+                        
+                    self.enableNewCollectionButtonIfPossible()
+                }
+            })
+    }
 
     
     
