@@ -65,7 +65,7 @@ class Pin: NSManagedObject, MKAnnotation {
             self.totalPages = 0
         }
         
-        pendingDownloads = 0
+        pendingDownloads = -1
     }
     
     func appendHistory(history: PinHistory) {

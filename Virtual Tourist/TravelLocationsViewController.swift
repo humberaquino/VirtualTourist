@@ -105,9 +105,9 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
             annotationView.annotation = annotation
         } else {
             annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: LocationPinIdentifier)
-            annotationView.draggable = true
             annotationView.animatesDrop = true
             annotationView.canShowCallout = true
+            annotationView.draggable = false
         }
         
         let detailButton: UIButton = UIButton.buttonWithType(UIButtonType.DetailDisclosure) as! UIButton
@@ -121,10 +121,9 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!,
         didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
             let pin = view.annotation as! Pin
+
             if newState == MKAnnotationViewDragState.Ending {
-                if pin.pendingDownloads > 0 {
-                    showDraggingNotAllowedMessage()
-                } else {
+                if pin.pendingDownloads == 0 {
                     // Add a pin history, update current pin and delete all the old photos. The save
                     pinService.addCurrentAsHistory(pin)
                     photoService.deletePinPhotosAndSave(pin)
@@ -135,10 +134,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
                     
                     // Now we can start downloading the photos of the new location
                     downloadPhotosForPin(pin)
-                }
-            } else if newState == MKAnnotationViewDragState.Dragging {
-                if pin.pendingDownloads > 0 {
-                    showDraggingNotAllowedMessage()
                 }
             }
     }
@@ -161,15 +156,23 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         let pin = view.annotation as! Pin
         var defaultColor: MKPinAnnotationColor = MKPinAnnotationColor.Green
         
-        if pin.pendingDownloads > 0 {
+        if pin.pendingDownloads == -1 {
+            defaultColor = MKPinAnnotationColor.Red
+            view.draggable = false
+        } else if pin.pendingDownloads == 0 {
+            view.pinColor = MKPinAnnotationColor.Green
+            view.draggable = true
+        } else {
             if pin.pendingDownloads < 10 {
-                defaultColor = MKPinAnnotationColor.Purple
+                 view.pinColor = MKPinAnnotationColor.Purple
             } else {
-                defaultColor = MKPinAnnotationColor.Red
+                 view.pinColor = MKPinAnnotationColor.Red
             }
+            // Prevent dragging
+            view.draggable = false
         }
         
-        view.pinColor = defaultColor
+        
     }
     
     // Mark: - Segue
