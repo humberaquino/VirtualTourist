@@ -238,10 +238,12 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         mapView.addAnnotation(pin)
     }
     
-    func updateAnnotation(pin: Pin) {
-        setupPinTitle(pin)
-        let annotationView = mapView.viewForAnnotation(pin) as! MKPinAnnotationView
-        configurePinColor(pinAnnotationView: annotationView)
+    func updateAnnotation(pin: Pin) {        
+        // On;y update if visible
+        if let annotationView = mapView.viewForAnnotation(pin) as? MKPinAnnotationView {
+            configurePinColor(pinAnnotationView: annotationView)
+            setupPinTitle(pin)
+        }
     }
     
     func removeAnnotation(pin: Pin) {

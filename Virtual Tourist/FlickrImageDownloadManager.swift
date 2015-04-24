@@ -158,8 +158,12 @@ class FlickrImageDownloadManager: NSObject {
                     photo.imageState = Photo.State.Ready
                     
                     self.performOnMainQueue {
-                        photo.pin!.decreasePendingDownloads()
-                        
+                        if let pin = photo.pin {
+                            pin.decreasePendingDownloads()
+                        } else {
+                            println("Photo downloaded without a pin")
+                            abort()
+                        }
                         // Save photo and pin count
                         CoreDataStackManager.sharedInstance().saveContext()
                         println("Saved: \(filename)")                  

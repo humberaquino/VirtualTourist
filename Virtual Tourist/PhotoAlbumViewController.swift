@@ -103,10 +103,13 @@ class PhotoAlbumViewController: UIViewController, UICollectionViewDataSource, UI
         
         // Delete image
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        // Only remove ready or failed images
+        if photo.imageState != Photo.State.New {
+            photoService.deletePhotoAndSave(photo)
+        } else {
+            showMessageWithTitle("Operation not allowed", message: "You can't delete a photo while it is downloading")
+        }
         
-        photoService.deletePhotoAndSave(photo)
-        
-
     }
     
     func configureCell(cell: PhotoCollectionViewCell, atIndexPath indexPath: NSIndexPath) {
